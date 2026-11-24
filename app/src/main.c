@@ -1,3 +1,4 @@
+
 #include <stdint.h>
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_rcc.h"
@@ -6,6 +7,9 @@
 #include "i2c1.h"
 
 volatile uint32_t g_monitor_counter = 0;
+volatile uint32_t g_max30102_found = 0;
+volatile uint32_t g_mlx90614_found = 0;
+volatile uint32_t g_i2c_test_count = 0;
 
 static void LED_Task(void *argument)
 {
@@ -32,6 +36,21 @@ static void Monitor_Task(void *argument)
     }
 }
 
+static void I2C_Test_Task(void *argument)
+{
+    (void)argument;
+
+    for (;;)
+    {
+        g_max30102_found = SensorI2C1_Probe(0x57);
+        g_mlx90614_found = SensorI2C1_Probe(0x5A);
+
+        ++g_i2c_test_count;
+
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
 void vApplicationMallocFailedHook(void)
 {
     taskDISABLE_INTERRUPTS();
@@ -42,6 +61,7 @@ void vApplicationStackOverflowHook(TaskHandle_t task, char *taskName)
 {
     (void)task;
     (void)taskName;
+
     taskDISABLE_INTERRUPTS();
     for (;;) {}
 }
@@ -60,6 +80,8 @@ int main(void)
     GPIO_Init(GPIOA, &gpio);
     GPIO_ResetBits(GPIOA, GPIO_Pin_0);
 
+    SensorI2C1_Init();
+
     if (xTaskCreate(LED_Task, "LED", 192, NULL, 2, NULL) != pdPASS)
     {
         for (;;) {}
@@ -70,6 +92,12 @@ int main(void)
         for (;;) {}
     }
 
+    if (xTaskCreate(I2C_Test_Task, "I2C", 192, NULL, 1, NULL) != pdPASS)
+    {
+        for (;;) {}
+    }
+
     vTaskStartScheduler();
+
     for (;;) {}
 }
