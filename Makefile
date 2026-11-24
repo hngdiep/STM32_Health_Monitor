@@ -23,6 +23,8 @@ CFLAGS := $(CPU) -std=gnu11 -Os -g3 -ffunction-sections -fdata-sections -Wall -W
 LDFLAGS := $(CPU) -nostartfiles -Tlinker.ld -Wl,--gc-sections,-Map=$(BUILD_DIR)/$(TARGET).map -specs=nano.specs -specs=nosys.specs
 LDFLAGS += -lm
 
+
+
 # Sensor, interface and data pipeline from origin/develop
 # SD, SPI, RTC and FatFS sources added from feature/sdcard-integration
 CSRC := app/src/main.c \
@@ -31,6 +33,7 @@ CSRC := app/src/main.c \
         app/src/monitor_task.c \
         app/src/health_queue.c \
         app/src/sd_task.c \
+        app/src/sd_rtc_sync.c \
         bsp/src/sd_rtc.c \
         drivers/src/i2c1.c \
         drivers/src/max30102.c \

@@ -1,3 +1,5 @@
+#include "sd_rtc.h"
+#include "sd_rtc_sync.h"
 
 #include <stdint.h>
 #include "stm32f10x_gpio.h"
@@ -70,6 +72,12 @@ int main(void)
 
     MonitorTask_SetHandles(s_led_handle, s_mon_handle, s_sensor_handle);
 
+    if (!SD_RTC_Init()) {
+        for (;;) {}
+    }
+    if (!SD_RTC_Sync_Start()) {
+        for (;;) {}
+    }
     vTaskStartScheduler();
 
     for (;;) {}
