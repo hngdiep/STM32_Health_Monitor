@@ -6,13 +6,24 @@ SIZE := arm-none-eabi-size
 CPU := -mcpu=cortex-m3 -mthumb -mfloat-abi=soft
 DEFS := -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER
 KERNEL := middlewares/FreeRTOS-Kernel
-INCS := -Iapp/inc -Iconfig -ILibraries/CMSIS/CM3/CoreSupport -ILibraries/CMSIS/CM3/DeviceSupport/ST/STM32F10x -ILibraries/STM32F10x_StdPeriph_Driver/inc -I$(KERNEL)/include -I$(KERNEL)/portable/GCC/ARM_CM3
+INCS := -Iapp/inc -Idrivers/inc -Iconfig -ILibraries/CMSIS/CM3/CoreSupport -ILibraries/CMSIS/CM3/DeviceSupport/ST/STM32F10x -ILibraries/STM32F10x_StdPeriph_Driver/inc -I$(KERNEL)/include -I$(KERNEL)/portable/GCC/ARM_CM3
 CFLAGS := $(CPU) -std=gnu11 -Os -g3 -ffunction-sections -fdata-sections -Wall -Wextra -MMD -MP $(DEFS) $(INCS)
 LDFLAGS := $(CPU) -nostartfiles -Tlinker.ld -Wl,--gc-sections,-Map=$(BUILD_DIR)/$(TARGET).map -specs=nano.specs -specs=nosys.specs
+LDFLAGS += -lm
 CSRC := app/src/main.c \
+        app/src/sensor_task.c \
+        app/src/led_task.c \
+        app/src/monitor_task.c \
+        app/src/health_queue.c \
+        drivers/src/i2c1.c \
+        drivers/src/max30102.c \
+        drivers/src/bpm.c \
+        drivers/src/mlx90614.c \
+        drivers/src/spo2.c \
         Libraries/CMSIS/CM3/DeviceSupport/ST/STM32F10x/system_stm32f10x.c \
         Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_rcc.c \
         Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_gpio.c \
+        Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_i2c.c \
         $(KERNEL)/tasks.c \
         $(KERNEL)/queue.c \
         $(KERNEL)/list.c \
