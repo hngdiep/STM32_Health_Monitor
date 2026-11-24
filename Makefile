@@ -9,8 +9,13 @@ KERNEL := middlewares/FreeRTOS-Kernel
 INCS := -Iapp/inc -Idrivers/inc -Iconfig -ILibraries/CMSIS/CM3/CoreSupport -ILibraries/CMSIS/CM3/DeviceSupport/ST/STM32F10x -ILibraries/STM32F10x_StdPeriph_Driver/inc -I$(KERNEL)/include -I$(KERNEL)/portable/GCC/ARM_CM3
 CFLAGS := $(CPU) -std=gnu11 -Os -g3 -ffunction-sections -fdata-sections -Wall -Wextra -MMD -MP $(DEFS) $(INCS)
 LDFLAGS := $(CPU) -nostartfiles -Tlinker.ld -Wl,--gc-sections,-Map=$(BUILD_DIR)/$(TARGET).map -specs=nano.specs -specs=nosys.specs
+LDFLAGS += -lm
 CSRC := app/src/main.c \
+        app/src/health_queue.c \
         drivers/src/i2c1.c \
+        drivers/src/bpm.c \
+        drivers/src/mlx90614.c \
+        drivers/src/spo2.c \
         Libraries/CMSIS/CM3/DeviceSupport/ST/STM32F10x/system_stm32f10x.c \
         Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_rcc.c \
         Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_gpio.c \
