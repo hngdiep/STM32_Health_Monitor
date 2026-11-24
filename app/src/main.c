@@ -3,6 +3,7 @@
 #include "stm32f10x_rcc.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "i2c1.h"
 
 volatile uint32_t g_monitor_counter = 0;
 
@@ -12,9 +13,10 @@ static void LED_Task(void *argument)
 
     for (;;)
     {
-        GPIO_ResetBits(GPIOC, GPIO_Pin_13);
+        GPIO_SetBits(GPIOA, GPIO_Pin_0);
         vTaskDelay(pdMS_TO_TICKS(500));
-        GPIO_SetBits(GPIOC, GPIO_Pin_13);
+
+        GPIO_ResetBits(GPIOA, GPIO_Pin_0);
         vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
@@ -47,13 +49,16 @@ void vApplicationStackOverflowHook(TaskHandle_t task, char *taskName)
 int main(void)
 {
     GPIO_InitTypeDef gpio;
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+
     GPIO_StructInit(&gpio);
-    gpio.GPIO_Pin = GPIO_Pin_13;
+    gpio.GPIO_Pin = GPIO_Pin_0;
     gpio.GPIO_Mode = GPIO_Mode_Out_PP;
     gpio.GPIO_Speed = GPIO_Speed_2MHz;
-    GPIO_Init(GPIOC, &gpio);
-    GPIO_SetBits(GPIOC, GPIO_Pin_13);
+
+    GPIO_Init(GPIOA, &gpio);
+    GPIO_ResetBits(GPIOA, GPIO_Pin_0);
 
     if (xTaskCreate(LED_Task, "LED", 192, NULL, 2, NULL) != pdPASS)
     {
