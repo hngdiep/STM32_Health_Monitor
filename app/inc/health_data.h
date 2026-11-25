@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 
+/* Du lieu goc tu cam bien - GIU NGUYEN */
 typedef struct
 {
     uint32_t timestamp_ms;
@@ -21,5 +22,51 @@ typedef struct
     uint8_t ambient_temp_valid;
 
 } HealthData_t;
+
+/* Du lieu phuc vu TFT */
+typedef struct
+{
+    uint16_t bpm;
+    uint8_t spo2;
+    int16_t temp_x10;
+
+    uint8_t valid;
+    uint8_t bpm_valid;
+    uint8_t spo2_valid;
+    uint8_t temp_valid;
+
+    uint8_t spo2_demo;
+
+    uint32_t updated_ms;
+
+} HealthReading;
+
+/* Nguong canh bao */
+typedef struct
+{
+    uint16_t bpm_max;
+    uint8_t spo2_min;
+    int16_t temp_max_x10;
+
+} HealthLimits;
+
+/* Quan ly du lieu giao dien */
+void HealthData_Init(void);
+
+void HealthData_SetMeasurements(
+    uint16_t bpm,
+    uint8_t spo2,
+    int16_t temp_x10,
+    uint8_t valid
+);
+
+/* Chuyen du lieu cam bien sang du lieu TFT */
+void HealthData_SetFromSensor(const HealthData_t *sensor);
+
+HealthReading HealthData_Get(void);
+
+/* Quan ly nguong canh bao */
+HealthLimits HealthLimits_Get(void);
+void HealthLimits_Set(HealthLimits limits);
 
 #endif
