@@ -11,13 +11,13 @@
 #define BG 0x0000U
 #define FG 0xFFFFU
 
-// Chi ve lai dong co noi dung thay doi
+//Chống nhấp nháy màn hình: chỉ vẽ lại nd khi bị thay đổi
 static void show_line(int y, const char *s, char *old)
 {
-    if (strcmp(s, old) == 0) return;
-    TFT_FillRect(10, y, 220, 20, BG);
-    TFT_DrawText(10, y, s, FG, BG);
-    strcpy(old, s);
+    if (strcmp(s, old) == 0) return;   // so sánh nd mới và cũ, nêu giống thì return
+    TFT_FillRect(10, y, 220, 20, BG);  // xóa nd cũ
+    TFT_DrawText(10, y, s, FG, BG);    // vẽ nd mới
+    strcpy(old, s);    // lưu nd vừa hiển thị để lần sau so sánh
 }
 
 void Health_UI_Task(void *argument)
@@ -36,9 +36,9 @@ void Health_UI_Task(void *argument)
 
     for (;;)
     {
-        r = HealthData_Get();
-        lim = HealthLimits_Get();
-        mode = HealthControls_GetMode();
+        r = HealthData_Get();  // r: BPM, SpO2, nhiệt độ
+        lim = HealthLimits_Get();  // các ngưỡng cảnh báo
+        mode = HealthControls_GetMode(); // chế độ đang chọn bằng nút SET
 
         warning = r.valid &&
             (r.bpm > lim.bpm_max ||

@@ -48,9 +48,14 @@ static void adjust(int8_t dir)
 }
 void Health_Buttons_Task(void *argument)
 {
+    // raw: trạng thái 3 nút vừa đọc được
+    // prev: trạng thái 3 nút trước đó
+    // stable: trạng thái 3 nút nhấn khi đã được xác nhận ổn định
+    // count: đếm số lần đọc trạng thái giống nhau liên tiếp
     uint8_t prev=0,stable=0,count=0,raw;
     (void)argument;
     buttons_init();
+    // Đọc trạng thái 3 nút
     for(;;) {
         raw=0;
         if(GPIO_ReadInputDataBit(GPIOA,BTN_SET)==Bit_RESET) raw|=1;
@@ -60,6 +65,7 @@ void Health_Buttons_Task(void *argument)
         if(count==3 && raw!=stable) {
             uint8_t rising=raw & (uint8_t)~stable;
             stable=raw;
+            // thưc hiện chức năng của nút 
             if(rising&1) g_mode=(uint8_t)((g_mode+1)%4);
             else if(rising&2) adjust(+1);
             else if(rising&4) adjust(-1);
@@ -88,11 +94,11 @@ void Health_Warning_Task(void *argument)
         HealthLimits l=HealthLimits_Get();
         uint8_t alert=r.valid && (r.bpm>l.bpm_max || r.spo2<l.spo2_min || r.temp_x10>l.temp_max_x10);
         if(alert) {
-            on=!on;
+            on=!on; // Đảo trạng thái, nhấp nháy led và buzzer
             if(on) GPIO_SetBits(GPIOB,WARN_LED|WARN_BUZZ);
             else GPIO_ResetBits(GPIOB,WARN_LED|WARN_BUZZ);
         } else {
-            on=0;
+            on=0; // Tắt led và buzzer khi ko có cảnh báo
             GPIO_ResetBits(GPIOB,WARN_LED|WARN_BUZZ);
         }
         vTaskDelay(pdMS_TO_TICKS(250));
